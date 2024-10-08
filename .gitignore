@@ -317,3 +317,13 @@ WebApi/obj/Release/net8.0/WebApi.assets.cache
 WebApi/obj/Release/net8.0/WebApi.GeneratedMSBuildEditorConfig.editorconfig
 WebApi/obj/Release/net8.0/WebApi.csproj.AssemblyReference.cache
 WebApi/obj/Release/net8.0/WebApi.GlobalUsings.g.cs
+/.vs
+/Tests/ComponentTests/obj/Release/net8.0
+/Tests/UnitTests/obj/Release/net8.0
+/DAL/DBContext/DBSegments/obj/Release/net8.0
+/DAL/RestUtil/MovieContentRest/obj/Release/net8.0
+/Tests/ComponentTests/obj/Debug/net8.0
+/WebApi/obj/Debug/net8.0
+/Tests/UnitTests/obj/Debug/net8.0
+/Models/obj
+/Services/obj
