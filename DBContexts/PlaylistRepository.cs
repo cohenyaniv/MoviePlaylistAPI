@@ -12,11 +12,13 @@ namespace MoviePlaylist.Repositories
     /// </summary>
     public class PlaylistRepository : IPlaylistRepository
     {
+        private readonly CosmosClient _cosmosClient;
         private readonly Microsoft.Azure.Cosmos.Container _container;
 
         public PlaylistRepository(CosmosClient cosmosClient, string databaseName, string containerName)
         {
-            _container = cosmosClient.GetContainer(databaseName, containerName);
+            _cosmosClient = cosmosClient;
+            _container = _cosmosClient.GetContainer(databaseName, containerName);
         }
 
         public async Task<Playlist> AddPlaylistAsync(Playlist playlist)

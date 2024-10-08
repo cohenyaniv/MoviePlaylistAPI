@@ -70,7 +70,7 @@ namespace WebApi.Controllers
             }
 
             var createdPlaylist = await _playlistService.CreatePlaylistAsync(playlist);
-            return CreatedAtAction(nameof(GetPlaylistById), new { id = createdPlaylist.Id }, createdPlaylist);
+            return CreatedAtAction(nameof(GetPlaylistById), new { id = createdPlaylist.PlaylistId }, createdPlaylist);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePlaylist(string id, [FromBody] Playlist playlist)
         {
-            if (playlist == null || id != playlist.Id || !ModelState.IsValid)
+            if (playlist == null || id != playlist.PlaylistId || !ModelState.IsValid)
             {
                 return BadRequest("Invalid playlist data.");
             }

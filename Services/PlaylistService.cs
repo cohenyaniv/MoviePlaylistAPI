@@ -29,7 +29,7 @@ namespace MoviePlaylist.Services
                 throw new ArgumentNullException(nameof(playlist));
 
             // Assign unique ID and creation timestamp
-            playlist.Id = Guid.NewGuid().ToString();
+            playlist.PlaylistId = Guid.NewGuid().ToString();
             playlist.CreatedAt = DateTime.UtcNow;
 
             return await _playlistRepository.AddPlaylistAsync(playlist);
@@ -51,7 +51,7 @@ namespace MoviePlaylist.Services
         /// </summary>
         public async Task<Playlist> UpdatePlaylistAsync(string id, Playlist playlist)
         {
-            if (playlist == null || id != playlist.Id)
+            if (playlist == null || id != playlist.PlaylistId)
                 throw new ArgumentException("Invalid playlist data.");
 
             var existingPlaylist = await _playlistRepository.GetPlaylistByIdAsync(id);
@@ -62,7 +62,7 @@ namespace MoviePlaylist.Services
             existingPlaylist.Name = playlist.Name;
             existingPlaylist.Tracks = playlist.Tracks;
 
-            return await _playlistRepository.UpdatePlaylistAsync(playlist.Id, existingPlaylist);
+            return await _playlistRepository.UpdatePlaylistAsync(playlist.PlaylistId, existingPlaylist);
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace MoviePlaylist.Services
             playlist.Status = PlaylistStatus.Started;
             playlist.LastStartedAt = DateTime.UtcNow;
 
-            await _playlistRepository.UpdatePlaylistAsync(playlist.Id, playlist);
+            await _playlistRepository.UpdatePlaylistAsync(playlist.PlaylistId, playlist);
             return true;
         }
 
@@ -106,7 +106,7 @@ namespace MoviePlaylist.Services
             playlist.Status = PlaylistStatus.Stopped;
             playlist.LastStoppedAt = DateTime.UtcNow;
 
-            await _playlistRepository.UpdatePlaylistAsync(playlist.Id, playlist);
+            await _playlistRepository.UpdatePlaylistAsync(playlist.PlaylistId, playlist);
             return true;
         }
 
@@ -126,7 +126,7 @@ namespace MoviePlaylist.Services
             playlist.Status = PlaylistStatus.Continued;
             playlist.LastStartedAt = DateTime.UtcNow;
 
-            await _playlistRepository.UpdatePlaylistAsync(playlist.Id, playlist);
+            await _playlistRepository.UpdatePlaylistAsync(playlist.PlaylistId, playlist);
             return true;
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace MoviePlaylist.Models
 {
@@ -11,7 +12,8 @@ namespace MoviePlaylist.Models
         /// <summary>
         /// Gets or sets the unique identifier for the playlist.
         /// </summary>
-        public string Id { get; set; }
+        [JsonProperty("id")]
+        public string PlaylistId { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the playlist.
