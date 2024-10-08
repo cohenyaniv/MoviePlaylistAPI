@@ -1,4 +1,4 @@
-using MoviePlaylist.API.Models;
+using MoviePlaylist.Models;
 using System.Threading.Tasks;
 
 namespace MoviePlaylist.Services
