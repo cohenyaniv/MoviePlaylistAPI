@@ -327,3 +327,10 @@ WebApi/obj/Release/net8.0/WebApi.GlobalUsings.g.cs
 /Tests/UnitTests/obj/Debug/net8.0
 /Models/obj
 /Services/obj
+/DBContexts/bin/Debug/net8.0
+/DBContexts/obj
+/Models/bin/Debug/net8.0
+/RestUtils/bin/Debug/net8.0
+/RestUtils/obj
+/Services/bin/Debug/net8.0
+/WebApi/bin/Debug/net8.0
