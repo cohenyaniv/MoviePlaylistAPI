@@ -1,6 +1,9 @@
 using Microsoft.Azure.Cosmos;
+using MoviePlaylist.DBContexts;
 using MoviePlaylist.Repositories;
 using MoviePlaylist.Services;
+using Azure.Storage.Blobs;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +12,27 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers(); // Registers controllers
+
+// Blob Storage configuration (Replace with actual values)
+var blobConnectionString = builder.Configuration["AzureBlobStorage:ConnectionString"];
+var blobContainerName = builder.Configuration["AzureBlobStorage:ContainerName"];
+
+// Queue Storage configuration (Replace with actual values)
+var queueConnectionString = builder.Configuration["AzureQueueStorage:ConnectionString"];
+var queueName = builder.Configuration["AzureQueueStorage:QueueName"];
+
+// Register the Blob Storage service
+builder.Services.AddSingleton(s => new BlobStorageService(blobConnectionString, blobContainerName));
+
+// Register the Queue service
+builder.Services.AddSingleton(s => new QueueService(queueConnectionString, queueName));
+
+// Register the background service for processing the queue (singleton by default)
+builder.Services.AddSingleton<QueueProcessorService>();
+
+// Add hosted service (QueueProcessorService acts as the background task)
+builder.Services.AddHostedService(provider =>
+    provider.GetRequiredService<QueueProcessorService>());
 
 // 1. Register CosmosDB Client
 builder.Services.AddSingleton(s =>
@@ -20,26 +44,41 @@ builder.Services.AddSingleton(s =>
     return cosmosClient;
 });
 
+builder.Services.AddSingleton<IBlobStorageService>(s =>
+    new BlobStorageService(blobConnectionString, blobContainerName));
+
 // 2. Register Repositories
-builder.Services.AddSingleton<IPlaylistRepository, PlaylistRepository>(s =>
+// Register Repositories
+builder.Services.AddScoped<IUserPlaylistRepository>(s =>
 {
+    var configuration = s.GetRequiredService<IConfiguration>();
     var cosmosClient = s.GetRequiredService<CosmosClient>();
-    string databaseName = builder.Configuration["CosmosDb:DatabaseName"];
-    string containerName = builder.Configuration["CosmosDb:ContainerName"];
-    return new PlaylistRepository(cosmosClient, databaseName, containerName);
+    string blobConnectionString = configuration["AzureBlobStorage:ConnectionString"];
+    string containerId = configuration["AzureBlobStorage:ContainerName"];
+    // Create BlobServiceClient
+    var blobServiceClient = new BlobServiceClient(blobConnectionString);
+    // Create BlobContainerClient
+    var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerId);
+
+
+    return new UserPlaylistRepository(blobContainerClient);
 });
 
-builder.Services.AddSingleton<ITrackRepository, TrackRepository>(s =>
+builder.Services.AddScoped<IPlaylistRepository>(s =>
 {
+    var configuration = s.GetRequiredService<IConfiguration>();
     var cosmosClient = s.GetRequiredService<CosmosClient>();
-    string databaseName = builder.Configuration["CosmosDb:DatabaseName"];
-    string containerName = builder.Configuration["CosmosDb:TrackContainerName"];  // Assuming you have a separate container for tracks.
-    return new TrackRepository(cosmosClient, databaseName, containerName);
+    string databaseId = configuration["CosmosDb:DatabaseName"];
+    string containerId = configuration["CosmosDb:ContainerName"];
+    return new PlaylistRepository(cosmosClient, databaseId, containerId);
 });
+
+builder.Services.AddScoped<IPlaylistService, PlaylistService>();
+builder.Services.AddScoped<ITrackService, TrackService>();
 
 // 3. Register Services
 builder.Services.AddScoped<IPlaylistService, PlaylistService>();
-builder.Services.AddScoped<ITrackService, TrackService>();
+
 
 
 var app = builder.Build();

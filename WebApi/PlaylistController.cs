@@ -119,21 +119,5 @@ namespace WebApi.Controllers
             }
             return NoContent();
         }
-
-        /// <summary>
-        /// Starts a specific playlist for a user.
-        /// </summary>
-        [HttpPost("{id}/start")]
-        public async Task<IActionResult> StartPlaylist(string id)
-        {
-            var result = await _playlistService.StartPlaylistAsync(id);
-            if (!result)
-            {
-                return NotFound();
-            }
-            return Ok(result);
-        }
-
-        // Additional endpoints can be added here as needed...
     }
 }

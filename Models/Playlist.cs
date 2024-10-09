@@ -30,19 +30,6 @@ namespace MoviePlaylist.Models
         /// </summary>
         public DateTime CreatedAt { get; set; }
 
-        /// <summary>
-        /// Gets or sets the status of the playlist (e.g., Started, Stopped).
-        /// </summary>
-        public PlaylistStatus Status { get; set; }
-
-        /// <summary>
-        /// Gets or sets the date and time when the playlist was last started.
-        /// </summary>
-        public DateTime? LastStartedAt { get; set; }
-
-        /// <summary>
-        /// Gets or sets the date and time when the playlist was last stopped.
-        /// </summary>
-        public DateTime? LastStoppedAt { get; set; }
+        
     }
 }

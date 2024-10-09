@@ -31,7 +31,7 @@ namespace MoviePlaylist.Repositories
         {
             try
             {
-                var response = await _container.ReadItemAsync<Playlist>(id, new PartitionKey(id));
+                var response = await _container.ReadItemAsync<Playlist>(id, PartitionKey.None);
                 return response.Resource;
             }
             catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
@@ -42,7 +42,7 @@ namespace MoviePlaylist.Repositories
 
         public async Task<Playlist> UpdatePlaylistAsync(string id, Playlist playlist)
         {
-            await _container.ReplaceItemAsync(playlist, id, new PartitionKey(id));
+            await _container.ReplaceItemAsync(playlist, id, PartitionKey.None);
             return playlist;
         }
 

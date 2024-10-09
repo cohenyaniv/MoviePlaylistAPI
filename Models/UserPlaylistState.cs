@@ -16,8 +16,8 @@
         Stopped,
 
         /// <summary>
-        /// Indicates that the playlist is currently continued from a stopped position.
+        /// Indicates that the playlist is currently attached to the user.
         /// </summary>
-        Continued
+        Attached
     }
 }

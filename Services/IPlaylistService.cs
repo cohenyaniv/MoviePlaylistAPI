@@ -31,16 +31,18 @@ namespace MoviePlaylist.Services
         /// <summary>
         /// Starts a playlist and initializes playback for the user.
         /// </summary>
-        Task<bool> StartPlaylistAsync(string playlistId);
+        Task<bool> StartPlaylistAsync(string playlistId, string userId);
 
         /// <summary>
         /// Stops the current playlist and records the playback position.
         /// </summary>
-        Task<bool> StopPlaylistAsync(string playlistId);
+        Task<bool> StopPlaylistAsync(string playlistId, string userId);
 
         /// <summary>
         /// Continues a playlist from where it was last stopped.
         /// </summary>
-        Task<bool> ContinuePlaylistAsync(string playlistId);
+        Task<bool> AttachPlaylistToUserAsync(string playlistId, string userId);
+
+        Task<PlaylistProgress> GetPlaylistProgressAsync(string playlistId, string userId);
     }
 }

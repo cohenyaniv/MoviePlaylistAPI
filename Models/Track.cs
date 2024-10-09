@@ -17,6 +17,8 @@ namespace MoviePlaylist.Models
         /// </summary>
         public string Title { get; set; }
 
+        public double Distance { get; set; }
+
         /// <summary>
         /// Gets or sets the list of segments in the track.
         /// </summary>
