@@ -334,3 +334,5 @@ WebApi/obj/Release/net8.0/WebApi.GlobalUsings.g.cs
 /RestUtils/obj
 /Services/bin/Debug/net8.0
 /WebApi/bin/Debug/net8.0
+/QueueService/bin/Debug/net8.0
+/QueueService/obj
