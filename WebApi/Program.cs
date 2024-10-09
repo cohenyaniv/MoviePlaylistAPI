@@ -38,8 +38,8 @@ builder.Services.AddHostedService(provider =>
 builder.Services.AddSingleton(s =>
 {
     var configuration = s.GetRequiredService<IConfiguration>();
-    string account = configuration["CosmosDb:Account"];
-    string key = configuration["CosmosDb:Key"];
+    string account = configuration["UserActionDB:Account"];
+    string key = configuration["UserActionDB:Key"];
     CosmosClient cosmosClient = new CosmosClient(account, key);
     return cosmosClient;
 });
@@ -49,28 +49,37 @@ builder.Services.AddSingleton<IBlobStorageService>(s =>
 
 // 2. Register Repositories
 // Register Repositories
-builder.Services.AddScoped<IUserPlaylistRepository>(s =>
+builder.Services.AddScoped<IUserHistoryRepository>(s =>
 {
     var configuration = s.GetRequiredService<IConfiguration>();
-    var cosmosClient = s.GetRequiredService<CosmosClient>();
     string blobConnectionString = configuration["AzureBlobStorage:ConnectionString"];
     string containerId = configuration["AzureBlobStorage:ContainerName"];
     // Create BlobServiceClient
     var blobServiceClient = new BlobServiceClient(blobConnectionString);
-    // Create BlobContainerClient
+    
     var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerId);
 
+    return new UserHistoryRepository(blobContainerClient);
+});
 
-    return new UserPlaylistRepository(blobContainerClient);
+builder.Services.AddScoped<IUserPlaylistRepository>(s =>
+{
+    var configuration = s.GetRequiredService<IConfiguration>();
+    var cosmosClient = s.GetRequiredService<CosmosClient>();
+    string databaseId = configuration["UserActionDB:DatabaseName"];
+    string containerId = configuration["UserActionDB:ContainerName"];
+    return new UserPlaylistRepository(cosmosClient, databaseId, containerId);
 });
 
 builder.Services.AddScoped<IPlaylistRepository>(s =>
 {
-    var configuration = s.GetRequiredService<IConfiguration>();
-    var cosmosClient = s.GetRequiredService<CosmosClient>();
-    string databaseId = configuration["CosmosDb:DatabaseName"];
-    string containerId = configuration["CosmosDb:ContainerName"];
-    return new PlaylistRepository(cosmosClient, databaseId, containerId);
+    var configuration = s.GetRequiredService<IConfiguration>();  
+    var cosmosClient = s.GetRequiredService<CosmosClient>();  
+    string databaseName = configuration["PlayListDB:DatabaseName"];  
+    string containerName = configuration["PlayListDB:ContainerName"];  
+
+    // Pass all dependencies to the PlaylistRepository constructor
+    return new PlaylistRepository(cosmosClient, databaseName, containerName);
 });
 
 builder.Services.AddScoped<IPlaylistService, PlaylistService>();

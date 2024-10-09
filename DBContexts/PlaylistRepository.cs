@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using MoviePlaylist.Models;
+using Newtonsoft.Json;
 
 namespace MoviePlaylist.Repositories
 {
@@ -15,10 +16,19 @@ namespace MoviePlaylist.Repositories
         private readonly CosmosClient _cosmosClient;
         private readonly Microsoft.Azure.Cosmos.Container _container;
 
+        private List<Playlist> _playlistList;
+
         public PlaylistRepository(CosmosClient cosmosClient, string databaseName, string containerName)
         {
             _cosmosClient = cosmosClient;
             _container = _cosmosClient.GetContainer(databaseName, containerName);
+
+            // this is for the mock playLists
+            // Path to the JSON file
+            string filePath = "ResourceMock/PlayLists.json";
+
+            // Initialize mock list from JSON file
+            _playlistList = InitializeListFromJson(filePath);
         }
 
         public async Task<Playlist> AddPlaylistAsync(Playlist playlist)
@@ -29,15 +39,17 @@ namespace MoviePlaylist.Repositories
 
         public async Task<Playlist> GetPlaylistByIdAsync(string id)
         {
-            try
-            {
-                var response = await _container.ReadItemAsync<Playlist>(id, PartitionKey.None);
-                return response.Resource;
-            }
-            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                return null; // Playlist not found
-            }
+            var result = _playlistList.FirstOrDefault(x => x.PlaylistId == id);
+            return result;
+            //try
+            //{
+            //    var response = await _container.ReadItemAsync<Playlist>(id, PartitionKey.None);
+            //    return response.Resource;
+            //}
+            //catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            //{
+            //    return null; // Playlist not found
+            //}
         }
 
         public async Task<Playlist> UpdatePlaylistAsync(string id, Playlist playlist)
@@ -71,6 +83,16 @@ namespace MoviePlaylist.Repositories
             }
 
             return results;
+        }
+
+        // Method to initialize a list from a JSON file
+        private static List<Playlist> InitializeListFromJson(string filePath)
+        {
+            // Read the JSON file
+            var jsonString = File.ReadAllText(filePath);
+
+            // Deserialize the JSON string into a list of Track objects
+            return JsonConvert.DeserializeObject<List<Playlist>>(jsonString);
         }
     }
 }

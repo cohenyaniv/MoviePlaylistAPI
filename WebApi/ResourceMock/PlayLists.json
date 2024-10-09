@@ -1,0 +1,22 @@
+[
+  {
+    "id": "1",
+    "name": "YanivTest1",
+    "tracks": [
+      {
+        "id": "Track1",
+        "title": "TrackTitle",
+        "segments": [
+          {
+            "leftTimeLocator": 0,
+            "rightTimeLocator": 100
+          }
+        ]
+      }
+    ],
+    "createdAt": "2024-10-08T21:16:52.779Z",
+    "status": 0,
+    "lastStartedAt": "2024-10-08T21:16:52.779Z",
+    "lastStoppedAt": "2024-10-08T21:16:52.779Z"
+  }
+]

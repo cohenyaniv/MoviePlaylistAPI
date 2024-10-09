@@ -1,4 +1,6 @@
-﻿using MoviePlaylist.Models;
+﻿using Models;
+using MoviePlaylist.Models;
+using MoviePlaylist.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +11,6 @@ namespace MoviePlaylist.DBContexts
 {
     public interface IBlobStorageService
     {
-        Task ArchivePlaylistAsync(Playlist playlist);
+        Task ArchivePlaylistAsync(UserCurrentPlaylist playlist);
     }
 }

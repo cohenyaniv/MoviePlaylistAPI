@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MoviePlaylist.DBContexts;
 using Azure.Storage.Blobs;
+using Models;
 
 namespace MoviePlaylist.DBContexts
 {
@@ -23,7 +24,7 @@ namespace MoviePlaylist.DBContexts
         }
 
         // Method to archive a completed playlist to Blob Storage
-        public async Task ArchivePlaylistAsync(Playlist playlist)
+        public async Task ArchivePlaylistAsync(UserCurrentPlaylist playlist)
         {
             var blobName = $"{playlist.PlaylistId}.json";
             var blobClient = _containerClient.GetBlobClient(blobName);

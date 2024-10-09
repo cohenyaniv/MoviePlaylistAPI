@@ -12,16 +12,18 @@ namespace MoviePlaylist.Services
     /// </summary>
     public class PlaylistService : IPlaylistService
     {
+        private readonly QueueService _queueService;
         private readonly IPlaylistRepository _playlistRepository;
         private readonly IUserPlaylistRepository _userPlaylistRepository;
 
         /// <summary>
         /// Initializes a new instance of the PlaylistService with the required repository dependency.
         /// </summary>
-        public PlaylistService(IPlaylistRepository playlistRepository, IUserPlaylistRepository userPlaylistRepository)
+        public PlaylistService(IPlaylistRepository playlistRepository, IUserPlaylistRepository userPlaylistRepository, QueueService queueService)
         {
             _playlistRepository = playlistRepository;
             _userPlaylistRepository = userPlaylistRepository;
+            _queueService = queueService;
         }
 
         /// <summary>
@@ -85,7 +87,7 @@ namespace MoviePlaylist.Services
         /// </summary>
         public async Task<bool> StartPlaylistAsync(string playlistId, string userId)
         {
-            var playlist = await _userPlaylistRepository.GetUserPlaylistAsync(playlistId, userId);
+            var playlist = await _userPlaylistRepository.GetUserPlaylistAsync(userId);
             if (playlist == null)
                 throw new Exception("Playlist not attached, please attach first.");
 
@@ -103,7 +105,8 @@ namespace MoviePlaylist.Services
             LastStartedAt = DateTime.UtcNow
             };
 
-            await _userPlaylistRepository.SaveUserPlaylistAsync(userCurrentPlaylist);
+            _queueService.QueueUserPlaylist(userCurrentPlaylist);
+            //await _userPlaylistRepository.SaveUserPlaylistAsync(userCurrentPlaylist);
             return true;
         }
 
@@ -117,13 +120,14 @@ namespace MoviePlaylist.Services
                 throw new Exception("Playlist not found.");
 
             // Get the user position
-            UserCurrentPlaylist userCurrentPlaylist = await _userPlaylistRepository.GetUserPlaylistAsync(playlistId, userId);
+            UserCurrentPlaylist userCurrentPlaylist = await _userPlaylistRepository.GetUserPlaylistAsync(userId);
 
             // Logic to stop playlist and save the current position
             userCurrentPlaylist.Status = PlaylistStatus.Stopped;
             userCurrentPlaylist.LastStartedAt = DateTime.UtcNow;
 
-            await _userPlaylistRepository.SaveUserPlaylistAsync(userCurrentPlaylist);
+            _queueService.QueueUserPlaylist(userCurrentPlaylist);
+            //await _userPlaylistRepository.SaveUserPlaylistAsync(userCurrentPlaylist);
             return true;
         }
 
@@ -138,7 +142,7 @@ namespace MoviePlaylist.Services
                 throw new Exception("Playlist not found.");
 
             // Get the user position
-            UserCurrentPlaylist userCurrentPlaylist = await _userPlaylistRepository.GetUserPlaylistAsync(playlistId,userId);
+            UserCurrentPlaylist userCurrentPlaylist = await _userPlaylistRepository.GetUserPlaylistAsync(userId);
             if (userCurrentPlaylist == null)
             {
                 // Logic to start playlist and initialize playback
@@ -149,11 +153,11 @@ namespace MoviePlaylist.Services
                     CurrentTrackIndex = 0,
                     PlaylistId = playlistId,
                     UserId = userId,
-                    Status = PlaylistStatus.Started,
+                    Status = PlaylistStatus.Attached,
                     LastStartedAt = DateTime.UtcNow
                 };
 
-                await _userPlaylistRepository.SaveUserPlaylistAsync(userCurrentPlaylist);
+                _queueService.QueueUserPlaylist(userCurrentPlaylist);
             }
             return true;
         }

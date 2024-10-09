@@ -11,14 +11,14 @@ namespace MoviePlaylist.Services
     {
         private readonly QueueService _queueService;
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IServiceScopeFactory _historyBlobFactory;
 
         // Constructor to inject necessary services
-        public QueueProcessorService(QueueService queueService, IServiceScopeFactory playlistRepositoryFactory, IBlobStorageService blobStorageService)
+        public QueueProcessorService(QueueService queueService, IServiceScopeFactory playlistRepositoryFactory, IServiceScopeFactory historyBlobFactory)
         {
             _queueService = queueService;
             _serviceScopeFactory = playlistRepositoryFactory;
-            _blobStorageService = blobStorageService;
+            _historyBlobFactory = historyBlobFactory;
         }
 
         // This method continuously listens to the queue and processes messages
@@ -27,22 +27,20 @@ namespace MoviePlaylist.Services
             while (!stoppingToken.IsCancellationRequested)
             {
                 // Get the next playlist ID from the queue
-                var playlistId = await _queueService.ReceiveMessageAsync();
+                var userCurrentPlayList = await _queueService.ReceiveMessageAsync();
 
-                if (!string.IsNullOrEmpty(playlistId))
+                if (userCurrentPlayList != null)
                 {
                     using (var scope = _serviceScopeFactory.CreateScope())
                     {
-                        var playlistRepository = scope.ServiceProvider.GetRequiredService<IPlaylistRepository>();
-                        var playlist = await playlistRepository.GetPlaylistByIdAsync(playlistId);
-
-                        // Retrieve the playlist by ID from CosmosDB
-
-                        if (playlist != null)
-                        {
-                            // Archive the playlist to Blob Storage
-                            await _blobStorageService.ArchivePlaylistAsync(playlist);
-                        }
+                        var playlistRepository = scope.ServiceProvider.GetRequiredService<IUserPlaylistRepository>();
+                        await playlistRepository.SaveUserPlaylistAsync(userCurrentPlayList);
+                    }
+                    using (var scope = _historyBlobFactory.CreateScope())
+                    {
+                        var historyRepository = scope.ServiceProvider.GetRequiredService<IUserHistoryRepository>();
+                        // Archive the playlist to Blob Storage
+                        await historyRepository.SaveUserPlaylistAsync(userCurrentPlayList);
                     }
                 }
 

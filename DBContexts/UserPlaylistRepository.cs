@@ -13,7 +13,8 @@ namespace MoviePlaylist.Repositories
     /// </summary>
     public class UserPlaylistRepository : IUserPlaylistRepository
     {
-        private readonly BlobContainerClient _blobClient;
+        private readonly CosmosClient _cosmosClient;
+        private readonly Microsoft.Azure.Cosmos.Container _container;
 
         /// <summary>
         /// Initializes a new instance of the UserPlaylistRepository with the given CosmosDB container.
@@ -21,31 +22,18 @@ namespace MoviePlaylist.Repositories
         /// <param name="cosmosClient">The CosmosClient instance for interacting with CosmosDB.</param>
         /// <param name="databaseId">The ID of the CosmosDB database.</param>
         /// <param name="containerId">The ID of the CosmosDB container.</param>
-        public UserPlaylistRepository(BlobContainerClient blobClient)
+        public UserPlaylistRepository(CosmosClient cosmosClient, string databaseName, string containerName)
         {
-            _blobClient = blobClient;
+            _cosmosClient = cosmosClient;
+            _container = _cosmosClient.GetContainer(databaseName, containerName);
         }
 
-        /// <summary>
-        /// Retrieves the user-specific playlist progress by user ID and playlist ID.
-        /// </summary>
-        /// <param name="userId">The ID of the user.</param>
-        /// <param name="playlistId">The ID of the playlist.</param>
-        /// <returns>A task representing the asynchronous operation, containing the user's playlist progress.</returns>
-        public async Task<UserCurrentPlaylist> GetUserPlaylistAsync(string playlistId, string userId)
+        public async Task AddPlaylistAsync(UserCurrentPlaylist playlist)
         {
-            try
-            {
-                //var response = await _container.ReadItemAsync<UserCurrentPlaylist>(playlistId, PartitionKey.None);
-                //return response.Resource;
-                return null;
-            }
-            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                // The playlist is not attached to user
-                return null; // Handle not found case
-            }
+            var response = await _container.CreateItemAsync(playlist);
+            //return response.Resource;
         }
+
 
         /// <summary>
         /// Saves or updates the user-specific playlist progress.
@@ -56,36 +44,45 @@ namespace MoviePlaylist.Repositories
         {
             try
             {
-                //await _container.UpsertItemAsync(userPlaylist, PartitionKey.None);
+                userPlaylist = new UserCurrentPlaylist() 
+                { 
+                UserId ="userId",
+                CurrentPositionInSegment = 1,
+                CurrentSegmentIndex = 0,
+                CurrentTrackIndex = 0,
+                Id = "Id",
+                LastStartedAt = DateTime.UtcNow,
+                LastStoppedAt = DateTime.UtcNow,
+                PlaylistId = "aaa",
+                Status = 0
+                };
+                await _container.UpsertItemAsync(userPlaylist, PartitionKey.None);
             }
-            catch (Exception)
+            catch (CosmosException ex)
             {
-                throw;
-            }            
+                throw ex;
+            }
         }
 
         /// <summary>
-        /// Retrieves the interaction history for a user in a specific playlist.
+        /// Retrieves the user-specific playlist progress by user ID and playlist ID.
         /// </summary>
         /// <param name="userId">The ID of the user.</param>
         /// <param name="playlistId">The ID of the playlist.</param>
-        /// <returns>A task representing the asynchronous operation, containing a list of interaction history records.</returns>
-        public async Task<List<InteractionHistory>> GetInteractionHistoryAsync(string userId, string playlistId)
+        /// <returns>A task representing the asynchronous operation, containing the user's playlist progress.</returns>
+        public async Task<UserCurrentPlaylist> GetUserPlaylistAsync(string userId)
         {
-            //var query = new QueryDefinition("SELECT * FROM c WHERE c.playlistId = @playlistId AND c.userId = @userId")
-            //    .WithParameter("@playlistId", playlistId)
-            //    .WithParameter("@userId", userId);
-
-            //var iterator = _container.GetItemQueryIterator<InteractionHistory>(query);
-
-            var results = new List<InteractionHistory>();
-            //while (iterator.HasMoreResults)
-            //{
-            //    var response = await iterator.ReadNextAsync();
-            //    results.AddRange(response.Resource);
-            //}
-
-            return results;
+            try
+            {
+                var response = await _container.ReadItemAsync<UserCurrentPlaylist>(userId, PartitionKey.None);
+                return response.Resource;
+                //return null;
+            }
+            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                // The playlist is not attached to user
+                return null; // Handle not found case
+            }
         }
     }
 }
