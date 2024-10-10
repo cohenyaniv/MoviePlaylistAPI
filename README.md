@@ -1,4 +1,4 @@
-ï»¿```
+```
 # Movie Playlist API
 
 ## Overview
@@ -23,12 +23,12 @@ The Movie Playlist API is a web application built with ASP.NET Core and Microsof
 
 ### Installation
 1. Clone the repository:
-Â  Â ```bash
-Â  Â git clone [https://github.com/cohenyaniv/MoviePlaylistAPI.git](https://github.com/cohenyaniv/MoviePlaylistAPI.git)
-Â  Â cd MoviePlaylistAPI
+   ```bash
+   git clone [https://github.com/cohenyaniv/MoviePlaylistAPI.git](https://github.com/cohenyaniv/MoviePlaylistAPI.git)
+   cd MoviePlaylistAPI
 
 ### Configuration
-Â - Need to update the appsettings.json file in case you want to use your own azure account
+ - Need to update the appsettings.json file in case you want to use your own azure account
 
 ### Movie Playlist Data
 - The available movie lists are currently stored in a JSON file under the `ResourceMock` folder. This is a temporary solution and in a production environment, the data source would likely be a database or another more robust storage solution.
@@ -44,5 +44,7 @@ The Movie Playlist API is a web application built with ASP.NET Core and Microsof
     * Component tests are entirely missing. Implementing component tests is crucial for ensuring proper functionality of individual components.
 * **Blob Naming:** Blob names currently lack meaningfulness. Implementing a clear naming convention for blobs would improve code maintainability.
 * **Logging:** Logging functionality is currently missing. Implementing logging would be beneficial for debugging and monitoring purposes.
+
+## Contributing
 
 ```
