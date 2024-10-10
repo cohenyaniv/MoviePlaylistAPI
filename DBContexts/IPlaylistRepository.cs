@@ -14,7 +14,7 @@ namespace MoviePlaylist.Repositories
         /// </summary>
         /// <param name="playlist">The playlist to add.</param>
         /// <returns>The created playlist.</returns>
-        Task<Playlist> AddPlaylistAsync(Playlist playlist);
+        //Task<Playlist> AddPlaylistAsync(Playlist playlist);
 
         /// <summary>
         /// Retrieves a playlist by its unique identifier.
@@ -29,19 +29,19 @@ namespace MoviePlaylist.Repositories
         /// <param name="id">The unique identifier of the playlist to update.</param>
         /// <param name="playlist">The updated playlist details.</param>
         /// <returns>The updated playlist.</returns>
-        Task<Playlist> UpdatePlaylistAsync(string id, Playlist playlist);
+        //Task<Playlist> UpdatePlaylistAsync(string id, Playlist playlist);
 
         /// <summary>
         /// Deletes a playlist by its unique identifier.
         /// </summary>
         /// <param name="id">The unique identifier of the playlist to delete.</param>
         /// <returns>True if the deletion was successful; otherwise, false.</returns>
-        Task<bool> DeletePlaylistAsync(string id);
+        //Task<bool> DeletePlaylistAsync(string id);
 
         /// <summary>
         /// Retrieves all playlists from the data store.
         /// </summary>
         /// <returns>A list of all playlists.</returns>
-        Task<IEnumerable<Playlist>> GetAllPlaylistsAsync();
+        //Task<IEnumerable<Playlist>> GetAllPlaylistsAsync();
     }
 }

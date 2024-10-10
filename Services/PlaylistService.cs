@@ -29,17 +29,17 @@ namespace MoviePlaylist.Services
         /// <summary>
         /// Creates a new playlist and assigns a unique ID and creation timestamp.
         /// </summary>
-        public async Task<Playlist> CreatePlaylistAsync(Playlist playlist)
-        {
-            if (playlist == null)
-                throw new ArgumentNullException(nameof(playlist));
+        //public async Task<Playlist> CreatePlaylistAsync(Playlist playlist)
+        //{
+        //    if (playlist == null)
+        //        throw new ArgumentNullException(nameof(playlist));
 
-            // Assign unique ID and creation timestamp
-            playlist.PlaylistId = Guid.NewGuid().ToString();
-            playlist.CreatedAt = DateTime.UtcNow;
+        //    // Assign unique ID and creation timestamp
+        //    playlist.PlaylistId = Guid.NewGuid().ToString();
+        //    playlist.CreatedAt = DateTime.UtcNow;
 
-            return await _playlistRepository.AddPlaylistAsync(playlist);
-        }
+        //    return await _playlistRepository.AddPlaylistAsync(playlist);
+        //}
 
         /// <summary>
         /// Retrieves a playlist by its ID.
@@ -55,32 +55,32 @@ namespace MoviePlaylist.Services
         /// <summary>
         /// Updates an existing playlist.
         /// </summary>
-        public async Task<Playlist> UpdatePlaylistAsync(string id, Playlist playlist)
-        {
-            if (playlist == null || id != playlist.PlaylistId)
-                throw new ArgumentException("Invalid playlist data.");
+        //public async Task<Playlist> UpdatePlaylistAsync(string id, Playlist playlist)
+        //{
+        //    if (playlist == null || id != playlist.PlaylistId)
+        //        throw new ArgumentException("Invalid playlist data.");
 
-            var existingPlaylist = await _playlistRepository.GetPlaylistByIdAsync(id);
-            if (existingPlaylist == null)
-                throw new Exception("Playlist not found.");
+        //    var existingPlaylist = await _playlistRepository.GetPlaylistByIdAsync(id);
+        //    if (existingPlaylist == null)
+        //        throw new Exception("Playlist not found.");
 
-            // Update properties
-            existingPlaylist.Name = playlist.Name;
-            existingPlaylist.Tracks = playlist.Tracks;
+        //    // Update properties
+        //    existingPlaylist.Name = playlist.Name;
+        //    existingPlaylist.Tracks = playlist.Tracks;
 
-            return await _playlistRepository.UpdatePlaylistAsync(playlist.PlaylistId, existingPlaylist);
-        }
+        //    return await _playlistRepository.UpdatePlaylistAsync(playlist.PlaylistId, existingPlaylist);
+        //}
 
         /// <summary>
         /// Deletes a playlist by its ID.
         /// </summary>
-        public async Task<bool> DeletePlaylistAsync(string id)
-        {
-            if (string.IsNullOrEmpty(id))
-                throw new ArgumentException("Playlist ID cannot be null or empty.");
+        //public async Task<bool> DeletePlaylistAsync(string id)
+        //{
+        //    if (string.IsNullOrEmpty(id))
+        //        throw new ArgumentException("Playlist ID cannot be null or empty.");
 
-            return await _playlistRepository.DeletePlaylistAsync(id);
-        }
+        //    return await _playlistRepository.DeletePlaylistAsync(id);
+        //}
 
         /// <summary>
         /// Starts a playlist, setting its status to 'Started' and recording the start time.
@@ -106,7 +106,6 @@ namespace MoviePlaylist.Services
             };
 
             _queueService.QueueUserPlaylist(userCurrentPlaylist);
-            //await _userPlaylistRepository.SaveUserPlaylistAsync(userCurrentPlaylist);
             return true;
         }
 
@@ -143,7 +142,8 @@ namespace MoviePlaylist.Services
 
             // Get the user position
             UserCurrentPlaylist userCurrentPlaylist = await _userPlaylistRepository.GetUserPlaylistAsync(userId);
-            if (userCurrentPlaylist == null)
+            // We are updating in case there is no playlist (new enter) or changed playlist
+            if (userCurrentPlaylist == null || userCurrentPlaylist.PlaylistId != playlistId)
             {
                 // Logic to start playlist and initialize playback
                 userCurrentPlaylist = new UserCurrentPlaylist()

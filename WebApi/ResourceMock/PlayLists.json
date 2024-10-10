@@ -1,22 +1,58 @@
 [
   {
     "id": "1",
-    "name": "YanivTest1",
+    "name": "PlayList1",
     "tracks": [
       {
         "id": "Track1",
-        "title": "TrackTitle",
+        "title": "FirstTrack",
+        "segments": [
+          {
+            "leftTimeLocator": 0,
+            "rightTimeLocator": 50
+          },
+          {
+            "leftTimeLocator": 50,
+            "rightTimeLocator": 100
+          },
+          {
+            "leftTimeLocator": 100,
+            "rightTimeLocator": 200
+          },
+          {
+            "leftTimeLocator": 200,
+            "rightTimeLocator": 400
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "PlayList2",
+    "tracks": [
+      {
+        "id": "Track1",
+        "title": "FirstTrack",
         "segments": [
           {
             "leftTimeLocator": 0,
             "rightTimeLocator": 100
+          },
+          {
+            "leftTimeLocator": 100,
+            "rightTimeLocator": 150
+          },
+          {
+            "leftTimeLocator": 150,
+            "rightTimeLocator": 250
+          },
+          {
+            "leftTimeLocator": 250,
+            "rightTimeLocator": 400
           }
         ]
       }
-    ],
-    "createdAt": "2024-10-08T21:16:52.779Z",
-    "status": 0,
-    "lastStartedAt": "2024-10-08T21:16:52.779Z",
-    "lastStoppedAt": "2024-10-08T21:16:52.779Z"
+    ]
   }
 ]

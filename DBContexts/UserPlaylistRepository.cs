@@ -32,7 +32,7 @@ namespace MoviePlaylist.Repositories
         {
             playlist.Id = playlist.UserId;
             playlist.LastStoppedAt = DateTime.UtcNow;
-            var response = await _container.CreateItemAsync(playlist);
+            await _container.UpsertItemAsync(playlist, PartitionKey.None);
             //return response.Resource;
         }
 

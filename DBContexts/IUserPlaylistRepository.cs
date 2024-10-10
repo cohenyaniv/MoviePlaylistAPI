@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Models;
-using MoviePlaylist.Models;
+﻿using Models;
 
 namespace MoviePlaylist.Repositories
 {
@@ -26,13 +23,5 @@ namespace MoviePlaylist.Repositories
         /// <param name="userPlaylist">The user's playlist progress object to save.</param>
         /// <returns>A task representing the asynchronous save operation.</returns>
         Task SaveUserPlaylistAsync(UserCurrentPlaylist userPlaylist);
-
-        /// <summary>
-        /// Retrieves the interaction history for a user in a specific playlist.
-        /// </summary>
-        /// <param name="userId">The ID of the user.</param>
-        /// <param name="playlistId">The ID of the playlist.</param>
-        /// <returns>A task representing the asynchronous operation, containing a list of interaction history records.</returns>
-        //Task<List<InteractionHistory>> GetInteractionHistoryAsync(string userId, string playlistId);
     }
 }

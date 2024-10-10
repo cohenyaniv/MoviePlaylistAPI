@@ -1,14 +1,16 @@
 ﻿using Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MoviePlaylist.Repositories
 {
+    /// <summary>
+    /// This interface responsible for saving the user action in the blob
+    /// </summary>
     public interface IUserHistoryRepository
     {
+        /// <summary>
+        /// Save the user current status in the history blob
+        /// </summary>
+        /// <param name="userPlaylist"></param>
         Task SaveUserPlaylistAsync(UserCurrentPlaylist userPlaylist);
     }
 }

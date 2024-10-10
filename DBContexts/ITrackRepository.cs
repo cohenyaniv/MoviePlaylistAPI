@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using MoviePlaylist.Models;
+﻿using MoviePlaylist.Models;
 
 namespace MoviePlaylist.Repositories
 {

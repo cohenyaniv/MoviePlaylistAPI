@@ -11,7 +11,7 @@ namespace MoviePlaylist.Services
         /// <summary>
         /// Creates a new playlist in the system.
         /// </summary>
-        Task<Playlist> CreatePlaylistAsync(Playlist playlist);
+        //Task<Playlist> CreatePlaylistAsync(Playlist playlist);
 
         /// <summary>
         /// Retrieves a playlist by its unique ID.
@@ -21,12 +21,12 @@ namespace MoviePlaylist.Services
         /// <summary>
         /// Updates an existing playlist.
         /// </summary>
-        Task<Playlist> UpdatePlaylistAsync(string id, Playlist playlist);
+        //Task<Playlist> UpdatePlaylistAsync(string id, Playlist playlist);
 
         /// <summary>
         /// Deletes a playlist by its ID.
         /// </summary>
-        Task<bool> DeletePlaylistAsync(string id);
+        //Task<bool> DeletePlaylistAsync(string id);
 
         /// <summary>
         /// Starts a playlist and initializes playback for the user.
