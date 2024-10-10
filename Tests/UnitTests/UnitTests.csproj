@@ -21,7 +21,6 @@
     <ProjectReference Include="..\..\DBContexts\DBContexts.csproj" />
     <ProjectReference Include="..\..\Models\Models.csproj" />
     <ProjectReference Include="..\..\QueueService\QueueService.csproj" />
-    <ProjectReference Include="..\..\RestUtils\RestUtils.csproj" />
     <ProjectReference Include="..\..\Services\Services.csproj" />
   </ItemGroup>
 

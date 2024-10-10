@@ -56,8 +56,8 @@ builder.Services.AddScoped<IUserPlaylistRepository>(s =>
 {
     var configuration = s.GetRequiredService<IConfiguration>();
     var cosmosClient = s.GetRequiredService<CosmosClient>();
-    string databaseId = configuration["PlayListDB:DatabaseName"];
-    string containerId = configuration["PlayListDB:ContainerName"];
+    string databaseId = configuration["UserActionDB:DatabaseName"];
+    string containerId = configuration["UserActionDB:ContainerName"];
     return new UserPlaylistRepository(cosmosClient, databaseId, containerId);
 });
 
