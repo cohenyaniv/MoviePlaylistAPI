@@ -1,8 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Net;
 
 // Middleware to handle exceptions globally in the application
 public class ExceptionHandlingMiddleware

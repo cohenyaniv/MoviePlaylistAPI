@@ -1,9 +1,6 @@
-using Microsoft.Azure.Cosmos;
 using Models;
 using MoviePlaylist.Models;
 using MoviePlaylist.Repositories;
-using System;
-using System.Threading.Tasks;
 
 namespace MoviePlaylist.Services
 {
@@ -15,33 +12,22 @@ namespace MoviePlaylist.Services
         private readonly QueueService _queueService;
         private readonly IPlaylistRepository _playlistRepository;
         private readonly IUserPlaylistRepository _userPlaylistRepository;
+        private readonly IUserHistoryRepository _userHistoryRepository;
+        private readonly UserCounterService _userCounterService;
 
         /// <summary>
         /// Initializes a new instance of the PlaylistService with the required repository dependency.
         /// </summary>
-        public PlaylistService(IPlaylistRepository playlistRepository, IUserPlaylistRepository userPlaylistRepository, QueueService queueService)
+        public PlaylistService(IPlaylistRepository playlistRepository, IUserPlaylistRepository userPlaylistRepository, QueueService queueService, UserCounterService userCounterService, IUserHistoryRepository userHistoryRepository)
         {
             _playlistRepository = playlistRepository;
             _userPlaylistRepository = userPlaylistRepository;
             _queueService = queueService;
+            _userCounterService = userCounterService;
+            _userHistoryRepository = userHistoryRepository;
         }
 
-        /// <summary>
-        /// Creates a new playlist and assigns a unique ID and creation timestamp.
-        /// </summary>
-        //public async Task<Playlist> CreatePlaylistAsync(Playlist playlist)
-        //{
-        //    if (playlist == null)
-        //        throw new ArgumentNullException(nameof(playlist));
-
-        //    // Assign unique ID and creation timestamp
-        //    playlist.PlaylistId = Guid.NewGuid().ToString();
-        //    playlist.CreatedAt = DateTime.UtcNow;
-
-        //    return await _playlistRepository.AddPlaylistAsync(playlist);
-        //}
-
-        /// <summary>
+       /// <summary>
         /// Retrieves a playlist by its ID.
         /// </summary>
         public async Task<Playlist> GetPlaylistByIdAsync(string id)
@@ -51,36 +37,6 @@ namespace MoviePlaylist.Services
 
             return await _playlistRepository.GetPlaylistByIdAsync(id);
         }
-
-        /// <summary>
-        /// Updates an existing playlist.
-        /// </summary>
-        //public async Task<Playlist> UpdatePlaylistAsync(string id, Playlist playlist)
-        //{
-        //    if (playlist == null || id != playlist.PlaylistId)
-        //        throw new ArgumentException("Invalid playlist data.");
-
-        //    var existingPlaylist = await _playlistRepository.GetPlaylistByIdAsync(id);
-        //    if (existingPlaylist == null)
-        //        throw new Exception("Playlist not found.");
-
-        //    // Update properties
-        //    existingPlaylist.Name = playlist.Name;
-        //    existingPlaylist.Tracks = playlist.Tracks;
-
-        //    return await _playlistRepository.UpdatePlaylistAsync(playlist.PlaylistId, existingPlaylist);
-        //}
-
-        /// <summary>
-        /// Deletes a playlist by its ID.
-        /// </summary>
-        //public async Task<bool> DeletePlaylistAsync(string id)
-        //{
-        //    if (string.IsNullOrEmpty(id))
-        //        throw new ArgumentException("Playlist ID cannot be null or empty.");
-
-        //    return await _playlistRepository.DeletePlaylistAsync(id);
-        //}
 
         /// <summary>
         /// Starts a playlist, setting its status to 'Started' and recording the start time.
@@ -95,17 +51,9 @@ namespace MoviePlaylist.Services
                 throw new Exception("The playlist already started.");
 
             // Logic to start playlist and initialize playback
-            UserCurrentPlaylist userCurrentPlaylist = new UserCurrentPlaylist() { 
-            CurrentPositionInSegment = 0,
-            CurrentSegmentIndex = 0,
-            CurrentTrackIndex = 0,
-            PlaylistId = playlistId,
-            UserId = userId,
-            Status = PlaylistStatus.Started,
-            LastStartedAt = DateTime.UtcNow
-            };
+            _userCounterService.StartCounter(userId);
 
-            _queueService.QueueUserPlaylist(userCurrentPlaylist);
+            _queueService.QueueUserPlaylist(playlist);
             return true;
         }
 
@@ -121,12 +69,17 @@ namespace MoviePlaylist.Services
             // Get the user position
             UserCurrentPlaylist userCurrentPlaylist = await _userPlaylistRepository.GetUserPlaylistAsync(userId);
 
+            // Stop the counter and get how many seconds passed
+            var runningSeconds = _userCounterService.GetCounterValue(userId);
+            _userCounterService.StopCounter(userId);
+
             // Logic to stop playlist and save the current position
             userCurrentPlaylist.Status = PlaylistStatus.Stopped;
-            userCurrentPlaylist.LastStartedAt = DateTime.UtcNow;
-
+            userCurrentPlaylist.LastStoppedAt = userCurrentPlaylist.LastStoppedAt.Value.AddSeconds(runningSeconds);
+            var totalDuration = userCurrentPlaylist.LastStoppedAt - userCurrentPlaylist.LastStartedAt;
+            
+            SetUserPositionInPlayList(playlist, totalDuration.Value.TotalSeconds, userCurrentPlaylist);
             _queueService.QueueUserPlaylist(userCurrentPlaylist);
-            //await _userPlaylistRepository.SaveUserPlaylistAsync(userCurrentPlaylist);
             return true;
         }
 
@@ -162,61 +115,72 @@ namespace MoviePlaylist.Services
             return true;
         }
 
-        public async Task<PlaylistProgress> GetPlaylistProgressAsync(string playlistId, string userId)
+        public async Task<PlaylistProgress> GetPlaylistProgressAsync(string userId)
         {
             // Fetch the playlist by ID from the repository
-            var playlist = await _playlistRepository.GetPlaylistByIdAsync(playlistId);
+            var userPlaylistDetails = await _userPlaylistRepository.GetUserPlaylistAsync(userId);
 
-            if (playlist == null)
+            if (userPlaylistDetails == null)
             {
-                throw new Exception($"Playlist with ID {playlistId} not found.");
+                throw new Exception($"User {userId} does not have current playlist.");
+            }
+
+            // Get the playList content
+            var playList = await _playlistRepository.GetPlaylistByIdAsync(userPlaylistDetails.PlaylistId);
+
+            if (playList == null)
+            {
+                throw new Exception($"Unable to find metadata for playlist {userPlaylistDetails.PlaylistId}.");
             }
 
             // Create and populate a new PlaylistProgress object
             var playlistProgress = new PlaylistProgress
             {
-                PlaylistId = playlist.PlaylistId,
-                TotalDistanceTraversed = CalculateTotalDistance(playlist),
-                CurrentTrackIndex = GetCurrentTrackIndex(userId, playlist),
-                CurrentTrackSegmentInfo = GetCurrentTrackSegmentInfo(userId, playlist),
-                AdjacentTrackSegmentInfo = GetAdjacentTrackSegmentInfo(userId, playlist),
-                CurrentTrackCompletionPercentage = CalculateTrackCompletion(userId, playlist),
-                PlaylistCompletionPercentage = CalculatePlaylistCompletion(userId, playlist),
-                InteractionHistories = GetInteractionHistory(userId, playlist),
-                TotalDuration = CalculateTotalDuration(userId, playlist)
+
+                PlaylistId = userPlaylistDetails.PlaylistId,
+                
+                CurrentTrackIndex = userPlaylistDetails.CurrentTrackIndex,
+                CurrentSegmentIndex = userPlaylistDetails.CurrentSegmentIndex,
+                TotalDistance = CalculateTotalDistance(playList),
+                CurrentTrackSegmentInfo = GetCurrentTrackSegmentInfo(userPlaylistDetails, playList),
+                AdjacentTrackSegmentInfo = GetAdjacentTrackSegmentInfo(userPlaylistDetails, playList),
+                CurrentTrackCompletionPercentage = CalculateTrackCompletion(userPlaylistDetails, playList),
+                PlaylistCompletionPercentage = CalculatePlaylistCompletion(userPlaylistDetails, playList),
+                InteractionHistories = await _userHistoryRepository.GetUserHistoryAsync(userId),
+                TotalDuration = CalculateTotalDuration(userPlaylistDetails, playList)
             };
 
             return playlistProgress;
         }
 
-        private double CalculateDistanceTraversed(UserCurrentPlaylist userPlaylist, Playlist playlist)
-        {
-            return 1;
-            // Sum up the length of segments in tracks that have been traversed
-        }
+        private void SetUserPositionInPlayList(Playlist playList, double totalDurationInSeconds, UserCurrentPlaylist userCurrentPlaylist) {
 
-        private double CalculateCurrentTrackPercentage(UserCurrentPlaylist userPlaylist, Playlist playlist)
-        {
-            return 1;
-            // Calculate how much of the current track the user has completed
-        }
+            int duration = 0;
+            int trackCounter = 0;
+            int segmentCounter;
+            // Get the duration from the start to the last stop
 
-        private double CalculateEntirePlaylistPercentage(UserCurrentPlaylist userPlaylist, Playlist playlist)
-        {
-            return 1;
-            // Calculate how much of the entire playlist has been completed
+            foreach (Track track in playList.Tracks)
+            {
+                segmentCounter = 0;
+                trackCounter++;
+                foreach (Segment segment in track.Segments)
+                {
+                    segmentCounter++;
+                    if (totalDurationInSeconds > segment.LeftTimeLocator && totalDurationInSeconds < segment.RightTimeLocator)
+                    {
+                        userCurrentPlaylist.CurrentTrackIndex = trackCounter;
+                        userCurrentPlaylist.CurrentSegmentIndex = segmentCounter;
+                        userCurrentPlaylist.CurrentPositionInSegment = segment.LeftTimeLocator + totalDurationInSeconds;
+                    }
+                }
+            }
         }
-
-        private Track GetTrackInfo(UserCurrentPlaylist userPlaylist, Playlist playlist)
-        {
-            return null;
-            // Provide information about the current track and segment
-        }
+       
         // Helper methods for calculating progress details
         private double CalculateTotalDistance(Playlist playlist)
         {
             // Calculate total distance traversed in the playlist (in kilometers)
-            // Example: Assume each track has a defined distance, sum them up
             double totalDistance = 0;
             foreach (var track in playlist.Tracks)
             {
@@ -237,34 +201,75 @@ namespace MoviePlaylist.Services
             return new TrackSegmentInfo(); // Example: Replace with actual logic
         }
 
-        private TrackSegmentInfo GetAdjacentTrackSegmentInfo(string userId, Playlist playlist)
+        /// <summary>
+        /// Get the next Track/Segment information 
+        /// </summary>
+        /// <param name="userPlaylistDetails"></param>
+        /// <param name="playlist"></param>
+        /// <returns>The information of the next segment and track</returns>
+        private TrackSegmentInfo GetAdjacentTrackSegmentInfo(UserCurrentPlaylist userPlaylistDetails, Playlist playlist)
         {
-            // Logic to retrieve details about the adjacent track segment
-            return new TrackSegmentInfo(); // Example: Replace with actual logic
+            TrackSegmentInfo AdjacentTrackSegmentInfo = new TrackSegmentInfo();
+            if (playlist.Tracks[userPlaylistDetails.CurrentTrackIndex-1].Segments.Count >= userPlaylistDetails.CurrentSegmentIndex)
+            {
+                AdjacentTrackSegmentInfo.TrackTitle = playlist.Tracks[userPlaylistDetails.CurrentTrackIndex-1].Title;
+                AdjacentTrackSegmentInfo.SegmentNumber = userPlaylistDetails.CurrentSegmentIndex;
+
+                // Get the next segmet on the current track
+            }
+            else // The next segment is on the next track (if exist)
+            {
+                if (playlist.Tracks.Count >= userPlaylistDetails.CurrentTrackIndex)
+                {
+                    AdjacentTrackSegmentInfo.TrackTitle = playlist.Tracks[userPlaylistDetails.CurrentTrackIndex].Title;
+                    AdjacentTrackSegmentInfo.SegmentNumber = 1;
+                }
+            }
+            return AdjacentTrackSegmentInfo;
         }
 
-        private double CalculateTrackCompletion(string userId, Playlist playlist)
+        private TrackSegmentInfo GetCurrentTrackSegmentInfo(UserCurrentPlaylist userPlaylistDetails, Playlist playlist)
         {
-            // Logic to calculate the percentage of the current track completed
-            return 0; // Example: Replace with actual logic
+            TrackSegmentInfo CurrentTrackSegmentInfo = new TrackSegmentInfo() { 
+                TrackTitle = playlist.Tracks[userPlaylistDetails.CurrentTrackIndex-1].Title,
+                SegmentNumber = userPlaylistDetails.CurrentSegmentIndex
+            };
+
+            return CurrentTrackSegmentInfo;
         }
 
-        private double CalculatePlaylistCompletion(string userId, Playlist playlist)
+        private double CalculateTrackCompletion(UserCurrentPlaylist userPlaylistDetails, Playlist playlist)
         {
-            // Logic to calculate the percentage of the entire playlist completed
-            return 0; // Example: Replace with actual logic
+            double totalTracksDurationAchived = 0;
+            for (int i = 0; i < userPlaylistDetails.CurrentTrackIndex; i++)
+            {
+                totalTracksDurationAchived += playlist.Tracks[i].Segments.Last<Segment>().RightTimeLocator;
+            }
+
+            return userPlaylistDetails.CurrentPositionInSegment / totalTracksDurationAchived * 100;
         }
 
-        private List<InteractionHistory> GetInteractionHistory(string userId, Playlist playlist)
+        private double CalculatePlaylistCompletion(UserCurrentPlaylist userPlaylistDetails, Playlist playlist)
         {
-            // Logic to retrieve the user's interaction history with the playlist
-            return new List<InteractionHistory>(); // Example: Replace with actual logic
+            double totalTracksDuration = 0;
+            // Get the left offset of the current track/segment
+            double totalLengthOfTrack = playlist.Tracks.Last<Track>().Segments.Last<Segment>().RightTimeLocator;
+            // Summerize duration of all tracks
+            foreach (var track in playlist.Tracks) {
+                totalTracksDuration += track.Segments.Last<Segment>().RightTimeLocator;
+            }
+            return userPlaylistDetails.CurrentPositionInSegment / totalTracksDuration * 100;
         }
 
-        private TimeSpan CalculateTotalDuration(string userId, Playlist playlist)
+        private string CalculateTotalDuration(UserCurrentPlaylist userPlaylistDetails, Playlist playlist)
         {
-            // Logic to calculate the total time spent on the playlist
-            return TimeSpan.Zero; // Example: Replace with actual logic
+            // Create a TimeSpan from the total seconds
+            TimeSpan timeSpan = TimeSpan.FromSeconds(userPlaylistDetails.CurrentPositionInSegment);
+
+            // Format the TimeSpan to HH:mm:ss
+            string formattedTime = timeSpan.ToString(@"hh\:mm\:ss");
+
+            return formattedTime;
         }
 
     }

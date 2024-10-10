@@ -5,10 +5,15 @@
     "tracks": [
       {
         "id": "Track1",
+        "distance": 30,
         "title": "FirstTrack",
         "segments": [
           {
             "leftTimeLocator": 0,
+            "rightTimeLocator": 20
+          },
+          {
+            "leftTimeLocator": 20,
             "rightTimeLocator": 50
           },
           {
@@ -17,11 +22,30 @@
           },
           {
             "leftTimeLocator": 100,
-            "rightTimeLocator": 200
+            "rightTimeLocator": 150
+          }
+        ]
+      },
+      {
+        "id": "Track2",
+        "distance": 20,
+        "title": "SecondTrack",
+        "segments": [
+          {
+            "leftTimeLocator": 0,
+            "rightTimeLocator": 20
           },
           {
-            "leftTimeLocator": 200,
-            "rightTimeLocator": 400
+            "leftTimeLocator": 20,
+            "rightTimeLocator": 50
+          },
+          {
+            "leftTimeLocator": 50,
+            "rightTimeLocator": 100
+          },
+          {
+            "leftTimeLocator": 100,
+            "rightTimeLocator": 150
           }
         ]
       }
@@ -32,6 +56,7 @@
     "name": "PlayList2",
     "tracks": [
       {
+        "distance":  10,
         "id": "Track1",
         "title": "FirstTrack",
         "segments": [
@@ -42,14 +67,21 @@
           {
             "leftTimeLocator": 100,
             "rightTimeLocator": 150
+          }
+        ]
+      },
+      {
+        "id": "Track2",
+        "distance": 20,
+        "title": "GoodOne",
+        "segments": [
+          {
+            "leftTimeLocator": 0,
+            "rightTimeLocator": 100
           },
           {
-            "leftTimeLocator": 150,
-            "rightTimeLocator": 250
-          },
-          {
-            "leftTimeLocator": 250,
-            "rightTimeLocator": 400
+            "leftTimeLocator": 100,
+            "rightTimeLocator": 150
           }
         ]
       }

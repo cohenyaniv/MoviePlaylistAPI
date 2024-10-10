@@ -79,10 +79,10 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        [HttpGet("progress/{playlistId}/{userId}")]
-        public async Task<IActionResult> GetPlaylistProgress(string playlistId, string userId)
+        [HttpGet("progress/{userId}")]
+        public async Task<IActionResult> GetPlaylistProgress(string userId)
         {
-            var progress = await _playlistService.GetPlaylistProgressAsync(playlistId, userId);
+            var progress = await _playlistService.GetPlaylistProgressAsync(userId);
             return Ok(progress);
         }
 

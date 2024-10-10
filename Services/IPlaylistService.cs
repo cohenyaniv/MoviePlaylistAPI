@@ -1,5 +1,4 @@
 using MoviePlaylist.Models;
-using System.Threading.Tasks;
 
 namespace MoviePlaylist.Services
 {
@@ -19,16 +18,6 @@ namespace MoviePlaylist.Services
         Task<Playlist> GetPlaylistByIdAsync(string id);
 
         /// <summary>
-        /// Updates an existing playlist.
-        /// </summary>
-        //Task<Playlist> UpdatePlaylistAsync(string id, Playlist playlist);
-
-        /// <summary>
-        /// Deletes a playlist by its ID.
-        /// </summary>
-        //Task<bool> DeletePlaylistAsync(string id);
-
-        /// <summary>
         /// Starts a playlist and initializes playback for the user.
         /// </summary>
         Task<bool> StartPlaylistAsync(string playlistId, string userId);
@@ -43,6 +32,6 @@ namespace MoviePlaylist.Services
         /// </summary>
         Task<bool> AttachPlaylistToUserAsync(string playlistId, string userId);
 
-        Task<PlaylistProgress> GetPlaylistProgressAsync(string playlistId, string userId);
+        Task<PlaylistProgress> GetPlaylistProgressAsync(string userId);
     }
 }

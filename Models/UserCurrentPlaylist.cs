@@ -15,7 +15,6 @@ namespace Models
         /// </summary>
         [JsonProperty("id")]
         public string UserId { get; set; }
-        public string Id { get; set; }
         public string PlaylistId { get; set; }
         public int CurrentTrackIndex { get; set; }
         public int CurrentSegmentIndex { get; set; }

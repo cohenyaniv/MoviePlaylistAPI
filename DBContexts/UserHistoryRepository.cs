@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
-using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.Cosmos.Core;
 using Models;
-using MoviePlaylist.Models;
 
 namespace MoviePlaylist.Repositories
 {
@@ -47,7 +41,7 @@ namespace MoviePlaylist.Repositories
             }
 
             // Convert the string content to a byte array
-            byte[] byteArray = Encoding.UTF8.GetBytes($"User {userPlaylist.UserId} {userPlaylist.Status} at track {userPlaylist.CurrentTrackIndex} segment {userPlaylist.CurrentSegmentIndex}"  + Environment.NewLine); // Add newline for separation
+            byte[] byteArray = Encoding.UTF8.GetBytes($"ActionTime {DateTime.UtcNow}, User {userPlaylist.UserId} {userPlaylist.Status} at track {userPlaylist.CurrentTrackIndex} segment {userPlaylist.CurrentSegmentIndex}"  + Environment.NewLine); // Add newline for separation
             using (var stream = new MemoryStream(byteArray))
             {
                 // Append the text to the blob
@@ -61,22 +55,17 @@ namespace MoviePlaylist.Repositories
         /// <param name="userId">The ID of the user.</param>
         /// <param name="playlistId">The ID of the playlist.</param>
         /// <returns>A task representing the asynchronous operation, containing a list of interaction history records.</returns>
-        public async Task<List<InteractionHistory>> GetInteractionHistoryAsync(string userId, string playlistId)
+        public async Task<string> GetUserHistoryAsync(string userId)
         {
-            //var query = new QueryDefinition("SELECT * FROM c WHERE c.playlistId = @playlistId AND c.userId = @userId")
-            //    .WithParameter("@playlistId", playlistId)
-            //    .WithParameter("@userId", userId);
+            BlobClient blobclient = _blobClient.GetBlobClient(userId);
+            // Download the blob's content as a stream
+            BlobDownloadInfo blobDownload = await blobclient.DownloadAsync();
 
-            //var iterator = _container.GetItemQueryIterator<InteractionHistory>(query);
-
-            var results = new List<InteractionHistory>();
-            //while (iterator.HasMoreResults)
-            //{
-            //    var response = await iterator.ReadNextAsync();
-            //    results.AddRange(response.Resource);
-            //}
-
-            return results;
+            using (StreamReader reader = new StreamReader(blobDownload.Content))
+            {
+                string content = await reader.ReadToEndAsync();
+                return content;
+            }
         }
     }
 }

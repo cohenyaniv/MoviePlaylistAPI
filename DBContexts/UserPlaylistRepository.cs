@@ -30,10 +30,8 @@ namespace MoviePlaylist.Repositories
 
         public async Task AddPlaylistAsync(UserCurrentPlaylist playlist)
         {
-            playlist.Id = playlist.UserId;
             playlist.LastStoppedAt = DateTime.UtcNow;
             await _container.UpsertItemAsync(playlist, PartitionKey.None);
-            //return response.Resource;
         }
 
 
@@ -46,19 +44,7 @@ namespace MoviePlaylist.Repositories
         {
             try
             {
-                UserCurrentPlaylist newUserPlaylist = new UserCurrentPlaylist() 
-                { 
-                UserId = userPlaylist.UserId,
-                CurrentPositionInSegment = 1,
-                CurrentSegmentIndex = 0,
-                CurrentTrackIndex = 0,
-                Id = userPlaylist.UserId,
-                LastStartedAt = DateTime.UtcNow,
-                LastStoppedAt = DateTime.UtcNow,
-                PlaylistId = userPlaylist.PlaylistId,
-                Status = 0
-                };
-                await _container.UpsertItemAsync(newUserPlaylist, PartitionKey.None);
+                await _container.UpsertItemAsync(userPlaylist, PartitionKey.None);
             }
             catch (CosmosException ex)
             {

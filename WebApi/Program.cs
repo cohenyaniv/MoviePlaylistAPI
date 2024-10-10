@@ -61,16 +61,9 @@ builder.Services.AddScoped<IUserPlaylistRepository>(s =>
     return new UserPlaylistRepository(cosmosClient, databaseId, containerId);
 });
 
-//builder.Services.AddScoped<IPlaylistRepository>(s =>
-//{
-//    var configuration = s.GetRequiredService<IConfiguration>();  
-//    var cosmosClient = s.GetRequiredService<CosmosClient>();  
-//    string databaseName = configuration["PlayListDB:DatabaseName"];  
-//    string containerName = configuration["PlayListDB:ContainerName"];  
-
-//    // Pass all dependencies to the PlaylistRepository constructor
-//    return new PlaylistRepository(cosmosClient, databaseName, containerName);
-//});
+// The counter service
+builder.Services.AddSingleton<UserCounterService>();
+builder.Services.AddHostedService<UserCounterService>();
 
 builder.Services.AddScoped<IPlaylistRepository, PlaylistRepository>();
 

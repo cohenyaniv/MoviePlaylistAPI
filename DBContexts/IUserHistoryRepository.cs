@@ -12,5 +12,7 @@ namespace MoviePlaylist.Repositories
         /// </summary>
         /// <param name="userPlaylist"></param>
         Task SaveUserPlaylistAsync(UserCurrentPlaylist userPlaylist);
+
+        Task<string> GetUserHistoryAsync(string userId);
     }
 }

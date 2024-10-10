@@ -15,14 +15,14 @@ namespace MoviePlaylist.Models
         public string PlaylistId { get; set; }
 
         /// <summary>
-        /// The total distance traversed in the playlist, in kilometers.
-        /// </summary>
-        public double TotalDistanceTraversed { get; set; }
-
-        /// <summary>
         /// The percentage of the current track that has been completed.
         /// </summary>
         public double CurrentTrackCompletionPercentage { get; set; }
+
+        /// <summary>
+        /// The total distance the the user achived
+        /// </summary>
+        public double TotalDistance { get; set; }
 
         /// <summary>
         /// The percentage of the entire playlist that has been completed.
@@ -47,12 +47,12 @@ namespace MoviePlaylist.Models
         /// <summary>
         /// The history of user interactions with the playlist (e.g., stops and starts).
         /// </summary>
-        public List<InteractionHistory> InteractionHistories { get; set; }
+        public string InteractionHistories { get; set; }
 
         /// <summary>
         /// The total time spent on the playlist across all user interactions (in hh:mm:ss format).
         /// </summary>
-        public TimeSpan TotalDuration { get; set; }
+        public string TotalDuration { get; set; }
 
         /// <summary>
         /// Information about the current track and segment.
@@ -107,20 +107,5 @@ namespace MoviePlaylist.Models
         /// The segment number within the track.
         /// </summary>
         public int SegmentNumber { get; set; }
-
-        /// <summary>
-        /// The left time locator of the current segment (in seconds).
-        /// </summary>
-        public double LeftTimeLocator { get; set; }
-
-        /// <summary>
-        /// The right time locator of the current segment (in seconds).
-        /// </summary>
-        public double RightTimeLocator { get; set; }
-
-        /// <summary>
-        /// The total duration of the current segment (in seconds).
-        /// </summary>
-        public double SegmentDuration => RightTimeLocator - LeftTimeLocator;
     }
 }
