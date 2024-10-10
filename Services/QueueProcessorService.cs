@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MoviePlaylist.Repositories;
-using MoviePlaylist.DBContexts;
+//using MoviePlaylist.DBContexts;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MoviePlaylist.Services
@@ -31,11 +31,24 @@ namespace MoviePlaylist.Services
 
                 if (userCurrentPlayList != null)
                 {
+                    // Update the user status
                     using (var scope = _serviceScopeFactory.CreateScope())
                     {
                         var playlistRepository = scope.ServiceProvider.GetRequiredService<IUserPlaylistRepository>();
-                        await playlistRepository.SaveUserPlaylistAsync(userCurrentPlayList);
+                        switch (userCurrentPlayList.Status)
+                        {
+                            case Models.PlaylistStatus.Attached:
+                                await playlistRepository.AddPlaylistAsync(userCurrentPlayList);
+                                break;
+                            default:
+                                await playlistRepository.SaveUserPlaylistAsync(userCurrentPlayList);
+                                break;
+                        }
+
+                        //await playlistRepository.SaveUserPlaylistAsync(userCurrentPlayList);
                     }
+
+                    // Write to history
                     using (var scope = _historyBlobFactory.CreateScope())
                     {
                         var historyRepository = scope.ServiceProvider.GetRequiredService<IUserHistoryRepository>();

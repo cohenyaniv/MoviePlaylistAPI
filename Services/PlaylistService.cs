@@ -91,8 +91,8 @@ namespace MoviePlaylist.Services
             if (playlist == null)
                 throw new Exception("Playlist not attached, please attach first.");
 
-            if (playlist.Status != PlaylistStatus.Stopped)
-                throw new Exception("Cannot continue a playlist that hasn't been stopped.");
+            if (playlist.Status == PlaylistStatus.Started)
+                throw new Exception("The playlist already started.");
 
             // Logic to start playlist and initialize playback
             UserCurrentPlaylist userCurrentPlaylist = new UserCurrentPlaylist() { 

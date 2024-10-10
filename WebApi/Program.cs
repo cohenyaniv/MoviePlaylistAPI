@@ -1,5 +1,5 @@
 using Microsoft.Azure.Cosmos;
-using MoviePlaylist.DBContexts;
+//using MoviePlaylist.DBContexts;
 using MoviePlaylist.Repositories;
 using MoviePlaylist.Services;
 using Azure.Storage.Blobs;
@@ -22,7 +22,7 @@ var queueConnectionString = builder.Configuration["AzureQueueStorage:ConnectionS
 var queueName = builder.Configuration["AzureQueueStorage:QueueName"];
 
 // Register the Blob Storage service
-builder.Services.AddSingleton(s => new BlobStorageService(blobConnectionString, blobContainerName));
+//builder.Services.AddSingleton(s => new BlobStorageService(blobConnectionString, blobContainerName));
 
 // Register the Queue service
 builder.Services.AddSingleton(s => new QueueService(queueConnectionString, queueName));
@@ -44,8 +44,8 @@ builder.Services.AddSingleton(s =>
     return cosmosClient;
 });
 
-builder.Services.AddSingleton<IBlobStorageService>(s =>
-    new BlobStorageService(blobConnectionString, blobContainerName));
+//builder.Services.AddSingleton<IBlobStorageService>(s =>
+//    new BlobStorageService(blobConnectionString, blobContainerName));
 
 // 2. Register Repositories
 // Register Repositories
@@ -66,8 +66,8 @@ builder.Services.AddScoped<IUserPlaylistRepository>(s =>
 {
     var configuration = s.GetRequiredService<IConfiguration>();
     var cosmosClient = s.GetRequiredService<CosmosClient>();
-    string databaseId = configuration["UserActionDB:DatabaseName"];
-    string containerId = configuration["UserActionDB:ContainerName"];
+    string databaseId = configuration["PlayListDB:DatabaseName"];
+    string containerId = configuration["PlayListDB:ContainerName"];
     return new UserPlaylistRepository(cosmosClient, databaseId, containerId);
 });
 

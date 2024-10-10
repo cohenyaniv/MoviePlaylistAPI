@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Specialized;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Cosmos.Core;
 using Models;
 using MoviePlaylist.Models;
 
@@ -46,7 +47,7 @@ namespace MoviePlaylist.Repositories
             }
 
             // Convert the string content to a byte array
-            byte[] byteArray = Encoding.UTF8.GetBytes($"User {userPlaylist.UserId} {userPlaylist.Status} at track {userPlaylist.CurrentTrackIndex} segment {userPlaylist.CurrentSegmentIndex}"  + "\n"); // Add newline for separation
+            byte[] byteArray = Encoding.UTF8.GetBytes($"User {userPlaylist.UserId} {userPlaylist.Status} at track {userPlaylist.CurrentTrackIndex} segment {userPlaylist.CurrentSegmentIndex}"  + Environment.NewLine); // Add newline for separation
             using (var stream = new MemoryStream(byteArray))
             {
                 // Append the text to the blob

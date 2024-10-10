@@ -1,4 +1,5 @@
 ﻿using MoviePlaylist.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,12 @@ namespace Models
 {
     public class UserCurrentPlaylist
     {
-        public string Id { get; set; }
+        /// <summary>
+        /// Gets or sets the unique identifier for the playlist.
+        /// </summary>
+        [JsonProperty("id")]
         public string UserId { get; set; }
+        public string Id { get; set; }
         public string PlaylistId { get; set; }
         public int CurrentTrackIndex { get; set; }
         public int CurrentSegmentIndex { get; set; }
