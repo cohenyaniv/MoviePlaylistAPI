@@ -336,3 +336,10 @@ WebApi/obj/Release/net8.0/WebApi.GlobalUsings.g.cs
 /WebApi/bin/Debug/net8.0
 /QueueService/bin/Debug/net8.0
 /QueueService/obj
+/Tests/UnitTests/bin/Debug/net8.0/CoverletSourceRootsMapping_UnitTests
+/Tests/UnitTests/bin/Debug/net8.0/DBContexts.dll
+/Tests/UnitTests/bin/Debug/net8.0/DBContexts.pdb
+/Tests/UnitTests/bin/Debug/net8.0/RestUtils.dll
+/Tests/UnitTests/bin/Debug/net8.0/RestUtils.pdb
+/Tests/UnitTests/bin/Debug/net8.0/Services.dll
+/Tests/UnitTests/bin/Debug/net8.0/Services.pdb
