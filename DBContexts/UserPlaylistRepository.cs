@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Azure.Storage.Blobs;
-using Microsoft.Azure.Cosmos;
+﻿using Microsoft.Azure.Cosmos;
 using Models;
-using MoviePlaylist.Models;
 
 namespace MoviePlaylist.Repositories
 {
@@ -14,7 +9,7 @@ namespace MoviePlaylist.Repositories
     public class UserPlaylistRepository : IUserPlaylistRepository
     {
         private readonly CosmosClient _cosmosClient;
-        private readonly Microsoft.Azure.Cosmos.Container _container;
+        private readonly Container _container;
 
         /// <summary>
         /// Initializes a new instance of the UserPlaylistRepository with the given CosmosDB container.

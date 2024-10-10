@@ -9,12 +9,12 @@ namespace MoviePlaylist.Services
 {
     public class QueueProcessorService : BackgroundService
     {
-        private readonly QueueService _queueService;
+        private readonly IQueueService _queueService;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IServiceScopeFactory _historyBlobFactory;
 
         // Constructor to inject necessary services
-        public QueueProcessorService(QueueService queueService, IServiceScopeFactory playlistRepositoryFactory, IServiceScopeFactory historyBlobFactory)
+        public QueueProcessorService(IQueueService queueService, IServiceScopeFactory playlistRepositoryFactory, IServiceScopeFactory historyBlobFactory)
         {
             _queueService = queueService;
             _serviceScopeFactory = playlistRepositoryFactory;

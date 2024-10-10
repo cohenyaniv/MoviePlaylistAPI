@@ -1,11 +1,19 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Hosting;
 
+/// <summary>
+/// This class run as a background service and hold for each user his running duration
+/// </summary>
 public class UserCounterService : BackgroundService
 {
     private readonly ConcurrentDictionary<string, CancellationTokenSource> _userCounters = new ConcurrentDictionary<string, CancellationTokenSource>();
     private readonly ConcurrentDictionary<string, int> _userCounterValues = new ConcurrentDictionary<string, int>();
 
+    /// <summary>
+    /// Starting point
+    /// </summary>
+    /// <param name="stoppingToken"></param>
+    /// <returns></returns>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         while (!stoppingToken.IsCancellationRequested)
@@ -14,6 +22,10 @@ public class UserCounterService : BackgroundService
         }
     }
 
+    /// <summary>
+    /// Start the counter for a specific user
+    /// </summary>
+    /// <param name="userId"></param>
     public void StartCounter(string userId)
     {
         var cts = new CancellationTokenSource();
@@ -47,6 +59,11 @@ public class UserCounterService : BackgroundService
         }
     }
 
+    /// <summary>
+    /// Get the user counter from the dictionary
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
     public int GetCounterValue(string userId)
     {
         // Return the current counter value for the user, defaulting to 0 if not found

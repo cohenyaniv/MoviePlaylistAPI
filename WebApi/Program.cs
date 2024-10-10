@@ -19,7 +19,7 @@ var queueConnectionString = builder.Configuration["AzureQueueStorage:ConnectionS
 var queueName = builder.Configuration["AzureQueueStorage:QueueName"];
 
 // Register the Queue service
-builder.Services.AddSingleton(s => new QueueService(queueConnectionString, queueName));
+builder.Services.AddSingleton<IQueueService>(s => new QueueService(queueConnectionString, queueName));
 
 // Register the background service for processing the queue (singleton by default)
 builder.Services.AddSingleton<QueueProcessorService>();

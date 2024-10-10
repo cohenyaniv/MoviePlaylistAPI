@@ -9,7 +9,7 @@ namespace MoviePlaylist.Services
     /// </summary>
     public class PlaylistService : IPlaylistService
     {
-        private readonly QueueService _queueService;
+        private readonly IQueueService _queueService;
         private readonly IPlaylistRepository _playlistRepository;
         private readonly IUserPlaylistRepository _userPlaylistRepository;
         private readonly IUserHistoryRepository _userHistoryRepository;
@@ -18,7 +18,7 @@ namespace MoviePlaylist.Services
         /// <summary>
         /// Initializes a new instance of the PlaylistService with the required repository dependency.
         /// </summary>
-        public PlaylistService(IPlaylistRepository playlistRepository, IUserPlaylistRepository userPlaylistRepository, QueueService queueService, UserCounterService userCounterService, IUserHistoryRepository userHistoryRepository)
+        public PlaylistService(IPlaylistRepository playlistRepository, IUserPlaylistRepository userPlaylistRepository, IQueueService queueService, UserCounterService userCounterService, IUserHistoryRepository userHistoryRepository)
         {
             _playlistRepository = playlistRepository;
             _userPlaylistRepository = userPlaylistRepository;
@@ -189,18 +189,6 @@ namespace MoviePlaylist.Services
             return totalDistance;
         }
 
-        private int GetCurrentTrackIndex(string userId, Playlist playlist)
-        {
-            // Logic to determine the current track index based on user progress
-            return 0; // Example: Replace with actual logic
-        }
-
-        private TrackSegmentInfo GetCurrentTrackSegmentInfo(string userId, Playlist playlist)
-        {
-            // Logic to retrieve details about the current track segment the user is in
-            return new TrackSegmentInfo(); // Example: Replace with actual logic
-        }
-
         /// <summary>
         /// Get the next Track/Segment information 
         /// </summary>
@@ -214,8 +202,6 @@ namespace MoviePlaylist.Services
             {
                 AdjacentTrackSegmentInfo.TrackTitle = playlist.Tracks[userPlaylistDetails.CurrentTrackIndex-1].Title;
                 AdjacentTrackSegmentInfo.SegmentNumber = userPlaylistDetails.CurrentSegmentIndex;
-
-                // Get the next segmet on the current track
             }
             else // The next segment is on the next track (if exist)
             {

@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace MoviePlaylist.Services
 {
-    public class QueueService
+    public class QueueService : IQueueService
     {
         private readonly QueueClient _queueClient;
 
