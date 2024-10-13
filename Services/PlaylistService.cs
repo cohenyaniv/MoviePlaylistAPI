@@ -163,15 +163,16 @@ namespace MoviePlaylist.Services
             foreach (Track track in playList.Tracks)
             {
                 segmentCounter = 0;
-                trackCounter++;
+                trackCounter = trackCounter + 1;
                 foreach (Segment segment in track.Segments)
                 {
-                    segmentCounter++;
+                    segmentCounter = segmentCounter + 1;
                     if (totalDurationInSeconds > segment.LeftTimeLocator && totalDurationInSeconds < segment.RightTimeLocator)
                     {
                         userCurrentPlaylist.CurrentTrackIndex = trackCounter;
                         userCurrentPlaylist.CurrentSegmentIndex = segmentCounter;
                         userCurrentPlaylist.CurrentPositionInSegment = segment.LeftTimeLocator + totalDurationInSeconds;
+                        return;
                     }
                 }
             }

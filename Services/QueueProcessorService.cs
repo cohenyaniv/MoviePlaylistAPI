@@ -1,8 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
-using System.Threading;
-using System.Threading.Tasks;
 using MoviePlaylist.Repositories;
-//using MoviePlaylist.DBContexts;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MoviePlaylist.Services

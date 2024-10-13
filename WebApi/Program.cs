@@ -39,7 +39,7 @@ builder.Services.AddSingleton(s =>
 });
 
 // Register Repositories
-builder.Services.AddScoped<IUserHistoryRepository>(s =>
+builder.Services.AddSingleton<IUserHistoryRepository>(s =>
 {
     var configuration = s.GetRequiredService<IConfiguration>();
     string blobConnectionString = configuration["AzureBlobStorage:ConnectionString"];
@@ -52,7 +52,7 @@ builder.Services.AddScoped<IUserHistoryRepository>(s =>
     return new UserHistoryRepository(blobContainerClient);
 });
 
-builder.Services.AddScoped<IUserPlaylistRepository>(s =>
+builder.Services.AddSingleton<IUserPlaylistRepository>(s =>
 {
     var configuration = s.GetRequiredService<IConfiguration>();
     var cosmosClient = s.GetRequiredService<CosmosClient>();
@@ -65,13 +65,13 @@ builder.Services.AddScoped<IUserPlaylistRepository>(s =>
 builder.Services.AddSingleton<UserCounterService>();
 builder.Services.AddHostedService<UserCounterService>();
 
-builder.Services.AddScoped<IPlaylistRepository, PlaylistRepository>();
+builder.Services.AddSingleton<IPlaylistRepository, PlaylistRepository>();
 
-builder.Services.AddScoped<IPlaylistService, PlaylistService>();
+builder.Services.AddSingleton<IPlaylistService, PlaylistService>();
 //builder.Services.AddScoped<ITrackService, TrackService>();
 
 // 3. Register Services
-builder.Services.AddScoped<IPlaylistService, PlaylistService>();
+builder.Services.AddSingleton<IPlaylistService, PlaylistService>();
 
 var app = builder.Build();
 
